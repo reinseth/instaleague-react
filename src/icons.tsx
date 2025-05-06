@@ -1,8 +1,9 @@
-import { IconContext, X } from "@phosphor-icons/react";
+import { Check, IconContext, X } from "@phosphor-icons/react";
 import { classNames } from "./utils.ts";
 
 const iconMap = {
   x: <X />,
+  check: <Check />,
 };
 
 export type IconName = keyof typeof iconMap;

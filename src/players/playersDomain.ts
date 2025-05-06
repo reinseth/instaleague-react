@@ -6,16 +6,14 @@ import {
   updateStore,
 } from "../domainHelpers.ts";
 
+export type PlayerFormState = {
+  id?: string;
+  name?: { value?: string; error?: string };
+};
+
 export type PlayersState = {
-  newPlayer?: {
-    name?: string;
-    error?: string;
-  };
-  editPlayer?: {
-    id?: string;
-    name?: string;
-    error?: string;
-  };
+  newPlayer?: PlayerFormState;
+  editPlayer?: PlayerFormState;
 };
 
 export type PlayersViewProps = {
@@ -26,23 +24,16 @@ export type PlayersViewProps = {
 
 export type PlayersListProps = {
   players: Player[];
+  form?: PlayerFormProps;
   deletePlayer: (id: string) => void;
+  editPlayer: (id: string) => void;
 };
 
-export type AddPlayerFormProps = {
-  fields: {
-    name: { value: string; error?: string; onChange: (value: string) => void };
-  };
+export type PlayerFormProps = {
+  id?: string;
+  name: { value?: string; error?: string; onChange: (value: string) => void };
   onSubmit: () => void;
 };
-
-export function prepPlayersList(props: PlayersViewProps): PlayersListProps {
-  return {
-    players: props.data?.players ?? [],
-    deletePlayer: (id) =>
-      props.dispatch([transact([deleteEntity("players", id)])]),
-  };
-}
 
 function containsName(players: Player[], name: string) {
   return players.some(
@@ -52,57 +43,91 @@ function containsName(players: Player[], name: string) {
 
 function validateName(
   context: PlayersViewProps,
-  form: PlayersState["newPlayer"] | PlayersState["editPlayer"],
+  form: PlayerFormState | undefined,
 ): string | undefined {
+  const existingPlayers = (context.data?.players ?? []).filter(
+    (p) => p.id !== form?.id,
+  );
   switch (true) {
-    case !form?.name?.trim():
+    case !form?.name?.value?.trim():
       return "Required";
-    case containsName(context.data?.players ?? [], form?.name ?? ""):
+    case containsName(existingPlayers, form?.name?.value ?? ""):
       return "Already exists";
   }
 }
 
-export function prepAddPlayerForm(props: PlayersViewProps): AddPlayerFormProps {
+export function prepPlayerForm(
+  props: PlayersViewProps,
+  formId: keyof PlayersState,
+): PlayerFormProps {
+  const form = props.store[formId];
   return {
-    fields: {
-      name: {
-        value: props.store.newPlayer?.name ?? "",
-        error: props.store.newPlayer?.error,
-        onChange: (value) =>
-          props.dispatch([
-            updateStore({
-              newPlayer: {
-                ...props.store.newPlayer,
-                name: value,
-                error: props.store.newPlayer?.error
+    id: form?.id,
+    name: {
+      ...form?.name,
+      value: form?.name?.value ?? "",
+      onChange: (value) =>
+        props.dispatch([
+          updateStore({
+            [formId]: {
+              ...form,
+              name: {
+                ...form?.name,
+                value,
+                error: form?.name?.error
                   ? validateName(props, {
-                      ...props.store.newPlayer,
-                      name: value,
+                      ...form,
+                      name: { ...form?.name, value },
                     })
                   : undefined,
               },
-            }),
-          ]),
-      },
+            },
+          }),
+        ]),
     },
     onSubmit: () => {
-      const error = validateName(props, props.store.newPlayer);
+      const error = validateName(props, form);
       if (error) {
         props.dispatch([
           updateStore({
-            newPlayer: { ...props.store.newPlayer, error },
+            [formId]: {
+              ...form,
+              name: { ...form?.name, error },
+            },
           }),
         ]);
       } else {
         props.dispatch([
           transact([
-            updateEntity("players", "new-id", {
-              name: props.store.newPlayer?.name ?? "",
+            updateEntity("players", form?.id ?? "new-id", {
+              name: form?.name?.value ?? "",
             }),
           ]),
-          updateStore({ newPlayer: undefined }),
+          updateStore({ [formId]: undefined }),
         ]);
       }
     },
+  };
+}
+
+export function prepPlayersList(props: PlayersViewProps): PlayersListProps {
+  return {
+    players: props.data?.players ?? [],
+    form: props.store.editPlayer
+      ? prepPlayerForm(props, "editPlayer")
+      : undefined,
+    deletePlayer: (id) =>
+      props.dispatch([transact([deleteEntity("players", id)])]),
+    editPlayer: (id) =>
+      props.dispatch([
+        updateStore({
+          editPlayer: {
+            id,
+            name: {
+              value: props.data?.players?.find((p) => p.id === id)?.name ?? "",
+            },
+          },
+        }),
+      ]),
   };
 }
