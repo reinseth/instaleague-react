@@ -4,9 +4,9 @@ export const leagueDetailsPage = definePage({
   id: "leagueDetails",
   route: "/leagues/:leagueId",
   query: (params) => ({
-    matches: {
-      player1: {},
-      player2: {},
+    leagues: {
+      players: {},
+      matches: {},
       $: {
         where: { id: String(params.leagueId) },
       },
