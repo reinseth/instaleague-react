@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import { type TransactionChunk, init as initDb, id } from "@instantdb/core";
+import { id, init as initDb, type TransactionChunk } from "@instantdb/core";
 import {
   type AppEvent,
   type AppStore,
@@ -16,10 +16,20 @@ import {
 } from "./domain.ts";
 import { produce } from "immer";
 import { playersPage } from "./players/playersPage.tsx";
+import UniversalRouter, { type RouteParams } from "universal-router/sync";
+import { isEqual } from "lodash";
 
 const appId = import.meta.env.VITE_APP_ID;
 const db = initDb({ appId, schema });
 const root = createRoot(document.getElementById("root")!);
+const router = new UniversalRouter<{ page: Page; params: RouteParams }>(
+  [playersPage].map((page) => ({
+    name: page.id,
+    path: page.route,
+    action: (context) => ({ page: page as Page, params: context.params }),
+  })),
+  { errorHandler: () => null },
+);
 
 let store: AppStore = {};
 let dbState:
@@ -72,31 +82,46 @@ function dispatch(events: AppEvent[]) {
   });
 }
 
-function currentPage(): Page<DbQuery> {
-  return playersPage as Page<DbQuery>;
+function routeMatch() {
+  return router.resolve(window.location.pathname);
 }
 
 function render() {
   root.render(
     <StrictMode>
-      {currentPage().render({ dispatch, data: dbState?.sub?.data, store })}
+      {routeMatch()?.page.render({
+        dispatch,
+        data: dbState?.sub?.data,
+        store,
+      })}
     </StrictMode>,
   );
 }
 
-function init() {
-  const page = currentPage();
-  const q = page.query();
-  dbState = {
-    q,
-    unsubscribe: db.subscribeQuery(q, (data) => {
-      if (dbState?.q === q) {
-        dbState.sub = data;
-        render();
-      }
-    }),
-  };
+function handleRouteChange() {
+  const match = routeMatch();
+  const q = match?.page.query(match?.params);
+  if (!isEqual(q, dbState?.q)) {
+    dbState?.unsubscribe();
+    dbState = undefined;
+    if (q) {
+      dbState = {
+        q,
+        unsubscribe: db.subscribeQuery(q, (data) => {
+          if (dbState && dbState?.q === q) {
+            dbState.sub = data;
+            render();
+          }
+        }),
+      };
+    }
+  }
   render();
+}
+
+function init() {
+  window.addEventListener("popstate", handleRouteChange);
+  handleRouteChange();
 }
 
 init();

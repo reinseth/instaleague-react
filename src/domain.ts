@@ -41,10 +41,10 @@ export type PageProps<Q extends DbQuery> = {
   store: AppStore;
 };
 
-export type Page<Q extends DbQuery> = {
+export type Page<Q extends DbQuery = DbQuery> = {
   id: string;
   route: string;
-  query: () => Q;
+  query: (params: { [paramName: string]: string | string[] }) => Q;
   render: (props: PageProps<Q>) => ReactElement;
 };
 

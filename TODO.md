@@ -4,7 +4,8 @@
 - [x] Setup players page
 - [x] Add player
 - [x] Remove player
-- [ ] Edit player
+- [x] Edit player
+- [x] Setup routing
 - [ ] Setup leagues page
 - [ ] Add league with current players
 - [ ] Create league fixture

@@ -3,7 +3,7 @@ import { definePage } from "../domainHelpers.ts";
 
 export const playersPage = definePage({
   id: "players",
-  route: "/players/:id",
+  route: "/players",
   query: () => ({ players: {} }),
   render: (props) => <PlayersView {...props} />,
 });
