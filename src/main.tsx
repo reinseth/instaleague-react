@@ -35,7 +35,7 @@ const router = new UniversalRouter<{ page: Page; params: RouteParams }>(
     path: page.route,
     action: (context) => ({ page: page as Page, params: context.params }),
   })),
-  { errorHandler: () => null },
+  { errorHandler: () => null, baseUrl: import.meta.env.BASE_URL },
 );
 const pageUrl = generateUrls(router);
 
