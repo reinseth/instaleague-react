@@ -11,17 +11,29 @@ import type { PlayersState } from "./players/playersDomain.ts";
 export const schema = i.schema({
   entities: {
     players: i.entity({
-      name: i.string().unique().indexed(),
-      email: i.string().unique().indexed(),
+      name: i.string().unique(),
     }),
     leagues: i.entity({
-      name: i.string().unique().indexed(),
+      name: i.string().unique(),
+    }),
+    matches: i.entity({
+      score1: i.number().optional(),
+      score2: i.number().optional(),
+      finished: i.boolean().optional(),
     }),
   },
   links: {
     leaguePlayers: {
       forward: { on: "leagues", has: "many", label: "players" },
       reverse: { on: "players", has: "many", label: "leagues" },
+    },
+    matchPlayer1: {
+      forward: { on: "matches", has: "one", label: "player1" },
+      reverse: { on: "players", has: "many", label: "matches" },
+    },
+    matchPlayer2: {
+      forward: { on: "matches", has: "one", label: "player2" },
+      reverse: { on: "players", has: "many", label: "matches" },
     },
   },
 });

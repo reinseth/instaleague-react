@@ -8,9 +8,10 @@
 - [x] Setup routing
 - [x] Setup leagues page
 - [ ] Add league with current players
+- [ ] Setup league fixture page
 - [ ] Create league fixture
       All players play each other once
-- [ ] Setup match page
+- [x] Setup match page
 - [ ] Track match score
 - [ ] Complete match
 - [ ] Create league results
