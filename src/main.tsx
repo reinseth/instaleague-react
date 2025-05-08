@@ -9,6 +9,7 @@ import {
   type DbQuery,
   type DbQueryState,
   type DbSchema,
+  type NavigateEvent,
   type Page,
   schema,
   type TransactEvent,
@@ -16,11 +17,12 @@ import {
 } from "./domain.ts";
 import { produce } from "immer";
 import { playersPage } from "./players/playersPage.tsx";
-import UniversalRouter, { type RouteParams } from "universal-router/sync";
+import UniversalRouter, { type RouteParams } from "universal-router";
 import { isEqual } from "lodash";
 import { leaguesPage } from "./leagues/leaguesPage.tsx";
 import { matchPage } from "./match/matchPage.tsx";
 import { leagueDetailsPage } from "./leagueDetails/leagueDetailsPage.tsx";
+import generateUrls from "universal-router/generateUrls";
 
 const pages = [playersPage, leaguesPage, leagueDetailsPage, matchPage];
 
@@ -35,15 +37,15 @@ const router = new UniversalRouter<{ page: Page; params: RouteParams }>(
   })),
   { errorHandler: () => null },
 );
+const pageUrl = generateUrls(router);
 
+let routeMatch: { page: Page; params: RouteParams } | null = null;
 let store: AppStore = {};
-let dbState:
-  | {
-      q: DbQuery;
-      sub?: DbQueryState<DbQuery>;
-      unsubscribe: () => void;
-    }
-  | undefined = undefined;
+let dbState: {
+  q?: DbQuery | null;
+  sub?: DbQueryState<DbQuery>;
+  unsubscribe?: () => void;
+} = {};
 
 function handleUpdateStoreEvent(event: UpdateStoreEvent) {
   store = produce(store, (draft) => {
@@ -73,6 +75,13 @@ function handleTransactEvent(event: TransactEvent) {
   } as TransactionChunk<DbSchema, DbEntity>);
 }
 
+function handleNavigateEvent(event: NavigateEvent) {
+  const url = pageUrl(event.pageId, event.params);
+  console.log(url);
+  window.history.pushState(null, "", url);
+  handleRouteChange();
+}
+
 function dispatch(events: AppEvent[]) {
   events.forEach((event) => {
     console.log(event);
@@ -83,18 +92,17 @@ function dispatch(events: AppEvent[]) {
       case "transact":
         handleTransactEvent(event);
         break;
+      case "navigate":
+        handleNavigateEvent(event);
+        break;
     }
   });
-}
-
-function routeMatch() {
-  return router.resolve(window.location.pathname);
 }
 
 function render() {
   root.render(
     <StrictMode>
-      {routeMatch()?.page.render({
+      {routeMatch?.page.render({
         dispatch,
         data: dbState?.sub?.data,
         store,
@@ -104,24 +112,27 @@ function render() {
 }
 
 function handleRouteChange() {
-  const match = routeMatch();
-  const q = match?.page.query(match?.params);
-  if (!isEqual(q, dbState?.q)) {
-    dbState?.unsubscribe();
-    dbState = undefined;
-    if (q) {
-      dbState = {
-        q,
-        unsubscribe: db.subscribeQuery(q, (data) => {
-          if (dbState && dbState?.q === q) {
-            dbState.sub = data;
-            render();
-          }
-        }),
-      };
-    }
-  }
-  render();
+  console.log("handleRouteChange: ", window.location.pathname);
+  router
+    .resolve(window.location.pathname)
+    .catch(() => null)
+    .then((m) => {
+      routeMatch = m as { page: Page; params: RouteParams } | null;
+      const q = routeMatch?.page.query(routeMatch?.params);
+      if (!isEqual(q, dbState?.q)) {
+        dbState?.unsubscribe?.();
+        dbState = { q };
+        if (q) {
+          dbState.unsubscribe = db.subscribeQuery(q, (data) => {
+            if (dbState?.q === q) {
+              dbState.sub = data;
+              render();
+            }
+          });
+        }
+      }
+      render();
+    });
 }
 
 function init() {

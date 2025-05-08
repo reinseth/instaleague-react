@@ -106,6 +106,12 @@ export type UnlinkEntity = {
   data: LinkParams<DbSchema, DbEntity>;
 };
 
-export type AppEvent = UpdateStoreEvent | TransactEvent;
+export type NavigateEvent = {
+  type: "navigate";
+  pageId: string;
+  params?: { [paramName: string]: string | string[] };
+};
+
+export type AppEvent = UpdateStoreEvent | TransactEvent | NavigateEvent;
 
 export type EventDispatcher = (events: AppEvent[]) => void;
