@@ -51,6 +51,7 @@ export type DbQueryState<Q extends DbQuery> = InstaQLSubscriptionState<
 >;
 
 export type Player = InstaQLEntity<DbSchema, "players">;
+export type Match = InstaQLEntity<DbSchema, "matches">;
 
 export type AppStore = PlayersState;
 
