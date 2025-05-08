@@ -36,9 +36,9 @@ export type PlayerFormProps = {
   onCancel?: () => void;
 };
 
-function containsName(players: Player[], name: string) {
-  return players.some(
-    (player) => player.name.toLocaleLowerCase() === name.toLocaleLowerCase(),
+export function containsName(arr: { name: string }[], name: string) {
+  return arr.some(
+    (object) => object.name.toLocaleLowerCase() === name.toLocaleLowerCase(),
   );
 }
 

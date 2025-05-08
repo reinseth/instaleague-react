@@ -5,5 +5,11 @@ export const playersPage = definePage({
   id: "players",
   route: "/players",
   query: () => ({ players: {} }),
-  render: (props) => <PlayersView {...props} />,
+  render: (props) => (
+    <PlayersView
+      dispatch={props.dispatch}
+      data={props.data}
+      store={props.store}
+    />
+  ),
 });

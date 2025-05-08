@@ -8,6 +8,7 @@ import {
 import type { ReactElement } from "react";
 import type { UpdateParams } from "@instantdb/core/src/schemaTypes.ts";
 import type { PlayersState } from "./players/playersDomain.ts";
+import type { LeaguesState } from "./leagues/leaguesDomain.ts";
 
 export const schema = i.schema({
   entities: {
@@ -53,7 +54,9 @@ export type DbQueryState<Q extends DbQuery> = InstaQLSubscriptionState<
 export type Player = InstaQLEntity<DbSchema, "players">;
 export type Match = InstaQLEntity<DbSchema, "matches">;
 
-export type AppStore = PlayersState;
+export type League = InstaQLEntity<DbSchema, "leagues">;
+
+export type AppStore = PlayersState & LeaguesState;
 
 export type PageProps<Q extends DbQuery> = {
   dispatch: EventDispatcher;

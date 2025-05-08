@@ -10,7 +10,7 @@ import { classNames } from "../utils.ts";
 import type { InputHTMLAttributes } from "react";
 import type { Player } from "../domain.ts";
 
-function TextInput({
+export function TextInput({
   error,
   onChange,
   className,
