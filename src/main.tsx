@@ -20,8 +20,9 @@ import UniversalRouter, { type RouteParams } from "universal-router/sync";
 import { isEqual } from "lodash";
 import { leaguesPage } from "./leagues/leaguesPage.tsx";
 import { matchPage } from "./match/matchPage.tsx";
+import { leagueDetailsPage } from "./leagueDetails/leagueDetailsPage.tsx";
 
-const pages = [playersPage, leaguesPage, matchPage];
+const pages = [playersPage, leaguesPage, leagueDetailsPage, matchPage];
 
 const appId = import.meta.env.VITE_APP_ID;
 const db = initDb({ appId, schema });
