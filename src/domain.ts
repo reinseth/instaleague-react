@@ -18,6 +18,12 @@ export const schema = i.schema({
       name: i.string().unique().indexed(),
     }),
   },
+  links: {
+    leaguePlayers: {
+      forward: { on: "leagues", has: "many", label: "players" },
+      reverse: { on: "players", has: "many", label: "leagues" },
+    },
+  },
 });
 
 export type DbSchema = typeof schema;

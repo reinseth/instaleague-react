@@ -6,7 +6,7 @@
 - [x] Remove player
 - [x] Edit player
 - [x] Setup routing
-- [ ] Setup leagues page
+- [x] Setup leagues page
 - [ ] Add league with current players
 - [ ] Create league fixture
       All players play each other once

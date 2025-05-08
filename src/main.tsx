@@ -18,12 +18,15 @@ import { produce } from "immer";
 import { playersPage } from "./players/playersPage.tsx";
 import UniversalRouter, { type RouteParams } from "universal-router/sync";
 import { isEqual } from "lodash";
+import { leaguesPage } from "./leagues/leaguesPage.tsx";
+
+const pages = [playersPage, leaguesPage];
 
 const appId = import.meta.env.VITE_APP_ID;
 const db = initDb({ appId, schema });
 const root = createRoot(document.getElementById("root")!);
 const router = new UniversalRouter<{ page: Page; params: RouteParams }>(
-  [playersPage].map((page) => ({
+  pages.map((page) => ({
     name: page.id,
     path: page.route,
     action: (context) => ({ page: page as Page, params: context.params }),
