@@ -3,6 +3,7 @@ import {
   type InstaQLEntity,
   type InstaQLParams,
   type InstaQLSubscriptionState,
+  type LinkParams,
 } from "@instantdb/core";
 import type { ReactElement } from "react";
 import type { UpdateParams } from "@instantdb/core/src/schemaTypes.ts";
@@ -75,7 +76,7 @@ export type UpdateStoreEvent = {
 
 export type TransactEvent = {
   type: "transact";
-  ops: Array<UpdateEntity | DeleteEntity>;
+  ops: Array<UpdateEntity | DeleteEntity | LinkEntity | UnlinkEntity>;
 };
 
 export type UpdateEntity = {
@@ -91,7 +92,19 @@ export type DeleteEntity = {
   id: string;
 };
 
-// "link" | "unlink"
+export type LinkEntity = {
+  action: "link";
+  entity: DbEntity;
+  id: string;
+  data: LinkParams<DbSchema, DbEntity>;
+};
+
+export type UnlinkEntity = {
+  action: "unlink";
+  entity: DbEntity;
+  id: string;
+  data: LinkParams<DbSchema, DbEntity>;
+};
 
 export type AppEvent = UpdateStoreEvent | TransactEvent;
 

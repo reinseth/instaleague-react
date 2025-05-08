@@ -59,15 +59,15 @@ function handleTransactEvent(event: TransactEvent) {
   db.transact({
     __ops: event.ops.map((op) => {
       switch (op.action) {
-        case "update":
+        case "delete":
+          return [op.action, op.entity, op.id, undefined];
+        default:
           return [
             op.action,
             op.entity,
             op.id === "new-id" ? id() : op.id,
             op.data,
           ];
-        case "delete":
-          return [op.action, op.entity, op.id, undefined];
       }
     }),
   } as TransactionChunk<DbSchema, DbEntity>);
