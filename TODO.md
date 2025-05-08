@@ -7,11 +7,12 @@
 - [x] Edit player
 - [x] Setup routing
 - [x] Setup leagues page
-- [ ] Add league with current players
-- [ ] Setup league fixture page
-- [ ] Create league fixture
-      All players play each other once
+- [x] Setup league fixture page
 - [x] Setup match page
-- [ ] Track match score
+- [ ] Add league with current players
+      All matches must be generated and stored when the league is created.
+- [ ] Show league fixture
+- [ ] Show league results
+- [ ] Start match
+- [ ] Register match results
 - [ ] Complete match
-- [ ] Create league results
