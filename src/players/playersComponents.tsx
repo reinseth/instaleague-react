@@ -77,7 +77,11 @@ function EditPlayerListItem(props: PlayerFormProps) {
         <button className="btn btn-primary" type={"submit"}>
           <Icon name={"check"} />
         </button>
-        <button className="btn btn-ghost" type={"button"}>
+        <button
+          className="btn btn-ghost"
+          type={"button"}
+          onClick={props.onCancel}
+        >
           <Icon name={"x"} />
         </button>
       </div>

@@ -33,6 +33,7 @@ export type PlayerFormProps = {
   id?: string;
   name: { value?: string; error?: string; onChange: (value: string) => void };
   onSubmit: () => void;
+  onCancel?: () => void;
 };
 
 function containsName(players: Player[], name: string) {
@@ -107,6 +108,7 @@ export function prepPlayerForm(
         ]);
       }
     },
+    onCancel: () => props.dispatch([updateStore({ [formId]: undefined })]),
   };
 }
 
