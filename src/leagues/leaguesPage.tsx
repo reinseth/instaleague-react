@@ -5,7 +5,10 @@ import { AddLeagueForm, LeaguesList } from "./leaguesComponents.tsx";
 export const leaguesPage = definePage({
   id: "leagues",
   route: "/leagues",
-  query: () => ({ leagues: { players: {} } }),
+  query: () => ({
+    leagues: { players: {}, matches: { player1: {}, player2: {} } },
+    players: {},
+  }),
   render: (props) => {
     console.log(props);
     return (
@@ -17,6 +20,7 @@ export const leaguesPage = definePage({
               store: props.store,
               dispatch: props.dispatch,
               leagues: props.data?.leagues,
+              players: props.data?.players,
             })}
           />
           <LeaguesList

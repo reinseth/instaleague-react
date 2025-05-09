@@ -29,13 +29,17 @@ export const schema = i.schema({
       forward: { on: "leagues", has: "many", label: "players" },
       reverse: { on: "players", has: "many", label: "leagues" },
     },
+    leagueMatches: {
+      forward: { on: "leagues", has: "many", label: "matches" },
+      reverse: { on: "matches", has: "one", label: "leagues" },
+    },
     matchPlayer1: {
       forward: { on: "matches", has: "one", label: "player1" },
-      reverse: { on: "players", has: "many", label: "matches" },
+      reverse: { on: "players", has: "many", label: "matches1" },
     },
     matchPlayer2: {
       forward: { on: "matches", has: "one", label: "player2" },
-      reverse: { on: "players", has: "many", label: "matches" },
+      reverse: { on: "players", has: "many", label: "matches2" },
     },
   },
 });
@@ -55,6 +59,8 @@ export type Player = InstaQLEntity<DbSchema, "players">;
 export type Match = InstaQLEntity<DbSchema, "matches">;
 
 export type League = InstaQLEntity<DbSchema, "leagues">;
+
+export type Match = InstaQLEntity<DbSchema, "matches">;
 
 export type AppStore = PlayersState & LeaguesState;
 
